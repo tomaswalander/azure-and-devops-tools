@@ -1,0 +1,169 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`utils filterOpenApiSpecByOperationIds should return only the specified operation ids: create-, list-, update- and delete-resource 1`] = `
+{
+  "basePath": "/api",
+  "host": "func-omnv-test-domain-experimentations.azurewebsites.net",
+  "info": {
+    "description": "This is the OpenAPI Document on Azure Functions",
+    "title": "Experimentations",
+    "version": "1.0.0",
+  },
+  "paths": {
+    "/v1/resources": {
+      "delete": {
+        "operationId": "delete-resource",
+        "responses": {},
+        "tags": [
+          "Resources",
+        ],
+      },
+      "get": {
+        "operationId": "list-resources",
+        "responses": {},
+        "tags": [
+          "Resources",
+        ],
+      },
+      "post": {
+        "operationId": "create-resource",
+        "responses": {},
+        "tags": [
+          "Resources",
+        ],
+      },
+      "put": {
+        "operationId": "update-resource",
+        "responses": {},
+        "tags": [
+          "Resources",
+        ],
+      },
+    },
+  },
+  "schemes": [
+    "https",
+  ],
+  "swagger": "2.0",
+}
+`;
+
+exports[`utils filterOpenApiSpecByOperationIds should return only the specified operation ids: create-resource and list-resources 1`] = `
+{
+  "basePath": "/api",
+  "host": "func-omnv-test-domain-experimentations.azurewebsites.net",
+  "info": {
+    "description": "This is the OpenAPI Document on Azure Functions",
+    "title": "Experimentations",
+    "version": "1.0.0",
+  },
+  "paths": {
+    "/v1/resources": {
+      "get": {
+        "operationId": "list-resources",
+        "responses": {},
+        "tags": [
+          "Resources",
+        ],
+      },
+      "post": {
+        "operationId": "create-resource",
+        "responses": {},
+        "tags": [
+          "Resources",
+        ],
+      },
+    },
+  },
+  "schemes": [
+    "https",
+  ],
+  "swagger": "2.0",
+}
+`;
+
+exports[`utils filterOpenApiSpecByOperationIds should return only the specified operation ids: health, create-, update- and delete-resource 1`] = `
+{
+  "basePath": "/api",
+  "host": "func-omnv-test-domain-experimentations.azurewebsites.net",
+  "info": {
+    "description": "This is the OpenAPI Document on Azure Functions",
+    "title": "Experimentations",
+    "version": "1.0.0",
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "health",
+        "responses": {},
+        "tags": [
+          "Monitoring",
+        ],
+      },
+    },
+    "/v1/resources": {
+      "delete": {
+        "operationId": "delete-resource",
+        "responses": {},
+        "tags": [
+          "Resources",
+        ],
+      },
+      "post": {
+        "operationId": "create-resource",
+        "responses": {},
+        "tags": [
+          "Resources",
+        ],
+      },
+      "put": {
+        "operationId": "update-resource",
+        "responses": {},
+        "tags": [
+          "Resources",
+        ],
+      },
+    },
+  },
+  "schemes": [
+    "https",
+  ],
+  "swagger": "2.0",
+}
+`;
+
+exports[`utils filterOpenApiSpecByOperationIds should return only the specified operation ids: ping and list-resources 1`] = `
+{
+  "basePath": "/api",
+  "host": "func-omnv-test-domain-experimentations.azurewebsites.net",
+  "info": {
+    "description": "This is the OpenAPI Document on Azure Functions",
+    "title": "Experimentations",
+    "version": "1.0.0",
+  },
+  "paths": {
+    "/ping": {
+      "get": {
+        "operationId": "ping",
+        "responses": {},
+        "tags": [
+          "Monitoring",
+        ],
+      },
+    },
+    "/v1/resources": {
+      "get": {
+        "operationId": "list-resources",
+        "responses": {},
+        "tags": [
+          "Resources",
+        ],
+      },
+    },
+  },
+  "schemes": [
+    "https",
+  ],
+  "swagger": "2.0",
+}
+`;

@@ -26,3 +26,5 @@ jobs:
       run: yarn format
     - name: Checking types
       run: yarn ts-check
+    - name: Running tests
+      run: yarn test

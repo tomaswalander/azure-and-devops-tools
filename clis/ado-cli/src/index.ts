@@ -14,6 +14,9 @@ program
         horizontalLayout: 'full',
       }),
     )} \n Tools for working with Azure and Azure DevOps`,
-  );
+  )
+  .command('apim', 'Tools for working with Api Management.', {
+    executableFile: './apim',
+  });
 
 program.parse(process.argv);

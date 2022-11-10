@@ -1,0 +1,240 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Experimentations",
+        "description": "This is the OpenAPI Document on Azure Functions",
+        "version": "1.0.0"
+    },
+    "host": "func-omnv-test-domain-experimentations.azurewebsites.net",
+    "basePath": "/api",
+    "schemes": [
+        "https"
+    ],
+    "paths": {
+        "/ping": {
+            "get": {
+                "tags": [
+                    "Monitoring",
+                    "apim-public"
+                ],
+                "summary": "Ping Pong",
+                "operationId": "ping",
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pong Response",
+                        "schema": {
+                            "$ref": "#/definitions/jsonApiObjectWrapper_string"
+                        },
+                        "x-ms-summary": "Pong"
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "tags": [
+                    "Monitoring",
+                    "apim-public"
+                ],
+                "summary": "Health",
+                "operationId": "health",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-Api-Key",
+                        "description": "The X-Api-Key",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "sig",
+                        "description": "Specify a valid signature to allow seeing the health check dependencies.",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The current health status of the Azure Function App",
+                        "schema": {
+                            "$ref": "#/definitions/jsonApiObjectWrapper_object"
+                        },
+                        "x-ms-summary": "Health Status"
+                    }
+                }
+            }
+        },
+        "/check-outbound-ip": {
+            "get": {
+                "tags": [
+                    "Monitoring",
+                    "apim-public"
+                ],
+                "summary": "Check outbound ip address",
+                "description": "Use this endpoint to see which IP address the Function App communicates to the Internet on",
+                "operationId": "check-outbound-ip",
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-Api-Key",
+                        "description": "The X-Api-Key",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "The IP address any dependency will see for outbound traffic from this App.",
+                        "schema": {
+                            "$ref": "#/definitions/jsonApiObjectWrapper_string"
+                        },
+                        "x-ms-summary": "Outbound IP"
+                    }
+                }
+            }
+        },
+        "/v1/allocations": {
+            "post": {
+                "tags": [
+                    "Allocations",
+                    "apim-public"
+                ],
+                "summary": "Create experimentations allocation",
+                "operationId": "createAllocations",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-Api-Key",
+                        "description": "The X-Api-Key",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "header",
+                        "name": "Authorization",
+                        "description": "The AuthToken of the logged in User",
+                        "type": "string",
+                        "x-ms-summary": "Bearer <token>"
+                    },
+                    {
+                        "in": "body",
+                        "name": "body",
+                        "description": "The create experimentations allocation request",
+                        "schema": {
+                            "$ref": "#/definitions/createAllocationRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "The created experimentations allocation response",
+                        "schema": {
+                            "$ref": "#/definitions/createAllocationResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/cache": {
+            "delete": {
+                "tags": [
+                    "Cache"
+                ],
+                "summary": "Clear cache",
+                "operationId": "clearCache",
+                "parameters": [
+                    {
+                        "in": "header",
+                        "name": "X-Api-Key",
+                        "description": "The X-Api-Key",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "header",
+                        "name": "X-Dev-Api-Key",
+                        "description": "The X-Dev-Api-Key",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "cachekey",
+                        "description": "State cachekey to clear for a specific key.",
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No description"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "createAllocationRequest": {
+            "type": "object",
+            "properties": {
+                "features": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "attributes": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "createAllocationResponse": {
+            "type": "object",
+            "properties": {
+                "allocationSessionId": {
+                    "format": "uuid",
+                    "type": "string"
+                },
+                "features": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "boolean"
+                    }
+                }
+            }
+        },
+        "jsonApiObjectWrapper_object": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object"
+                }
+            }
+        },
+        "jsonApiObjectWrapper_string": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

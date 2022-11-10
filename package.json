@@ -8,8 +8,8 @@
   "private": true,
   "workspaces": {
     "packages": [
-      "packages/cli",
-      "packages/*"
+      "clis/**/*",
+      "packages/**/*"
     ]
   },
   "lint-staged": {
@@ -22,7 +22,7 @@
     "format": "prettier --check **/*.ts",
     "lint": "eslint . --format unix --ext .js,.ts --max-warnings=0",
     "prepare": "husky install",
-    "test": "yarn workspaces run test",
+    "test": "jest -c ./jest.unit.config.js",
     "ts-check": "yarn workspaces run ts-check"
   },
   "dependencies": {},
