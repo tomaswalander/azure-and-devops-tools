@@ -20,11 +20,10 @@
     "clean": "yarn workspaces run clean",
     "build": "yarn workspaces run build",
     "format": "prettier --check **/*.ts",
-    "lint": "yarn workspaces run lint",
+    "lint": "eslint . --format unix --ext .js,.ts --max-warnings=0",
     "prepare": "husky install",
     "test": "yarn workspaces run test",
-    "ts-check": "yarn workspaces run ts-check",
-    "stylelint-check": "stylelint-config-prettier-check"
+    "ts-check": "yarn workspaces run ts-check"
   },
   "dependencies": {},
   "devDependencies": {

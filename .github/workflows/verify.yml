@@ -1,0 +1,35 @@
+name: verify
+run-name: verify
+on: [push]
+jobs:
+  verify:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+        - macos-latest
+        - windows-latest
+        node_version:
+        - 16.15.1
+        architecture:
+          - x64
+        # an extra windows-x86 run:
+        include:
+          - os: windows-2016
+            node_version: 12
+            architecture: x86
+    name: [${{ matrix.architecture }}][${{ matrix.os }}][${{ matrix.node_version }}]
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '16.15.1'
+        cache: 'yarn'
+    - name: Installing dependencies
+      run: yarn install --frozen-lockfile # optional, --immutable
+    - name: Linting
+      run: yarn lint
+    - name: Checking code formatting
+      run: yarn format
+    - name: Checking types
+      run: yarn ts-check

@@ -7,7 +7,6 @@
   "scripts": {
     "clean": "rimraf dist && rimraf tsconfig.tsbuildinfo",
     "build": "yarn clean && tsc -p .",
-    "lint": "eslint . --format unix --ext .js,.ts --max-warnings=0",
     "test": "jest",
     "ts-check": "tsc --noEmit",
     "ado-cli": "node dist/index.js",
