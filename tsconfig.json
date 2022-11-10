@@ -1,0 +1,21 @@
+{
+    "exclude": [
+      "**/node_modules"
+    ],
+    "compilerOptions": {
+      "composite": true,
+      "target": "es2015",
+      "module": "commonjs",
+      "allowJs": false,
+      "moduleResolution": "node",
+      "isolatedModules": true,
+      "allowSyntheticDefaultImports": true,
+      "esModuleInterop": true,
+      "forceConsistentCasingInFileNames": true,
+      "strict": true,
+      "allowUnreachableCode": false,
+      "skipLibCheck": true
+    },
+    "references": [],
+  }
+  

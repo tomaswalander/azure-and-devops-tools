@@ -1,0 +1,49 @@
+{
+  "name": "@twalander/azure-and-devops-tools",
+  "version": "0.0.3",
+  "description": "Tools, bots, and apps for Azure and Azure DevOps that I often need in my private projects",
+  "repository": "git@github.com:tomaswalander/azure-and-devops-tools.git",
+  "author": "Tomas Walander <twalander@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "packages/cli",
+      "packages/*"
+    ]
+  },
+  "lint-staged": {
+    "*.ts": "yarn format",
+    "*.js": "yarn format"
+  },
+  "scripts": {
+    "clean": "yarn workspaces run clean",
+    "build": "yarn workspaces run build",
+    "format": "prettier --check **/*.ts",
+    "lint": "yarn workspaces run lint",
+    "prepare": "husky install",
+    "test": "yarn workspaces run test",
+    "ts-check": "yarn workspaces run ts-check",
+    "stylelint-check": "stylelint-config-prettier-check"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/jest": "^29.2.2",
+    "@types/node": "^18.11.9",
+    "@typescript-eslint/eslint-plugin": "^5.42.1",
+    "@typescript-eslint/parser": "^5.42.1",
+    "eslint": "^8.27.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jest": "^27.1.5",
+    "eslint-plugin-prettier": "^4.2.1",
+    "husky": "^8.0.2",
+    "jest": "^29.3.1",
+    "lint-staged": "^13.0.3",
+    "prettier": "^2.7.1",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^29.0.3",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^4.8.4"
+  }
+}
