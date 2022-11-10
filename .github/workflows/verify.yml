@@ -7,16 +7,16 @@ jobs:
     strategy:
       matrix:
         os:
-        - macos-latest
-        - windows-latest
+          - macos-latest
+          - windows-latest
         node_version:
-        - '16.15.1'
-    name: [${{ matrix.os }}][${{ matrix.node_version }}]
+          - '16.15.1'
+    name: '[${{ matrix.os }}][${{ matrix.node_version }}]'
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-node@v3
       with:
-        node-version: '16.15.1'
+        node-version: ${{ matrix.node_version }}
         cache: 'yarn'
     - name: Installing dependencies
       run: yarn install --frozen-lockfile # optional, --immutable
