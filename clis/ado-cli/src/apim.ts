@@ -17,6 +17,10 @@ withApimInstanceOptions(
     ),
 )
   .option(
+    '--apply',
+    'Should the changes be applied? If not specified the command will ONLY make a dry-run, validating the provided options and configurations and printing the planned API:s.',
+  )
+  .option(
     '-u, --url <string>',
     'A Url to a publicly accessible OpenApi specification to use',
   )

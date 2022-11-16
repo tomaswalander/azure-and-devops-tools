@@ -1,4 +1,7 @@
+import Joi, { ValidationError } from 'joi';
 import { OpenAPIV2 } from 'openapi-types';
+
+import { ApiConfig } from './types';
 
 type OpenApiV2Paths = OpenAPIV2.Document['paths'];
 
@@ -11,6 +14,34 @@ const methodsToCheck = [
   OpenAPIV2.HttpMethods.HEAD,
   OpenAPIV2.HttpMethods.OPTIONS,
 ];
+const apiConfigSchema = Joi.array()
+  .required()
+  .items(
+    Joi.object({
+      displayName: Joi.string().required(),
+      description: Joi.string().required(),
+      path: Joi.string().required(),
+      operationIds: Joi.array()
+        .required()
+        .min(1)
+        .items(Joi.string())
+        .unique()
+        .allow(null),
+      name: Joi.string().required(),
+      products: Joi.array().required().items(Joi.string()).unique(),
+      parameters: Joi.any(), // cannot really validate all Azure Apim options
+    }),
+  )
+  .unique('path')
+  .unique('displayName')
+  .unique('name');
+
+export const validateApiConfigs = (
+  config: ApiConfig[] | undefined,
+): undefined | ValidationError => {
+  const result = apiConfigSchema.validate(config);
+  return result.error;
+};
 
 const checkOperationIdOnMethod = (
   operationIds: string[],
@@ -29,8 +60,11 @@ const checkOperationIdOnMethod = (
 
 export const filterOpenApiSpecByOperationIds = (
   openApiSpec: OpenAPIV2.Document,
-  operationIds: string[],
+  operationIds: null | string[],
 ): OpenAPIV2.Document => {
+  if (!operationIds) {
+    return openApiSpec;
+  }
   const filteredOpenApiSpec: OpenAPIV2.Document = {
     ...openApiSpec,
     paths: Object.keys(openApiSpec.paths).reduce(

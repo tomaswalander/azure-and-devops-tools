@@ -3,7 +3,7 @@
   "references": [],
   "compilerOptions": {
     "composite": true,
-    "outDir": "./dist",
+    "outDir": "./lib",
     "rootDir": "./src"
   }
 }

@@ -5,5 +5,5 @@ module.exports = {
   testEnvironment: 'node',
   testRegex: './src/.*\\.(test|spec)?\\.(ts|ts)$',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  roots: ['<rootDir>/clis', '<rootDir>/packages'],
+  roots: ['<rootDir>/clis'],
 };

@@ -10,7 +10,12 @@ import axios from 'axios';
 import { Command, program } from 'commander';
 import { OpenAPIV2 } from 'openapi-types';
 
-import { filterOpenApiSpecByOperationIds } from './utils';
+import {
+  ApiConfig,
+  PublishToApimWithOperationIdFilterOptions,
+  PublishToApimOptions,
+} from './types';
+import { filterOpenApiSpecByOperationIds, validateApiConfigs } from './utils';
 
 const credential =
   process.env.TENANT_ID && process.env.CLIENT_ID && process.env.CLIENT_SECRET
@@ -21,46 +26,17 @@ const credential =
       )
     : new DefaultAzureCredential();
 
-type NonChangeableProps = 'protocols' | 'format' | 'value';
-type MandatoryProps = 'displayName' | 'description' | 'path';
-
-type AdditionalParameters = Omit<
-  ApiCreateOrUpdateParameter,
-  NonChangeableProps | MandatoryProps
->;
-
-interface PublishToApimOptions
-  extends Required<Pick<ApiCreateOrUpdateParameter, MandatoryProps>> {
-  subscriptionId: string;
-  resourceGroupName: string;
-  apiManagementName: string;
-
-  name: string;
-  openApiSpec: OpenAPIV2.Document;
-  products: string[];
-
-  parameters?: AdditionalParameters;
-}
-
-const _publishApiToApim = async (
-  options: PublishToApimOptions,
-): Promise<void> => {
-  console.log(options);
-  const {
-    subscriptionId,
-    resourceGroupName,
-    apiManagementName,
-
-    name,
-    displayName,
-    path,
-    products,
-
-    openApiSpec,
-
-    parameters,
-  } = options;
-
+const _publishApiToApim = async ({
+  subscriptionId,
+  resourceGroupName,
+  apiManagementName,
+  name,
+  displayName,
+  path,
+  products,
+  openApiSpec,
+  parameters,
+}: PublishToApimOptions): Promise<void> => {
   const client = new ApiManagementClient(credential, subscriptionId);
 
   const finalParameters: ApiCreateOrUpdateParameter = {
@@ -91,37 +67,21 @@ const _publishApiToApim = async (
   );
 };
 
-interface ApiConfigFromSpec extends PublishToApimOptions {
-  operationIds: string[];
-}
-
 export const publishApiFromSpec = async ({
   openApiSpec,
   operationIds,
   ...rest
-}: ApiConfigFromSpec): Promise<void> => {
+}: PublishToApimWithOperationIdFilterOptions): Promise<void> => {
   _publishApiToApim({
     ...rest,
     openApiSpec: filterOpenApiSpecByOperationIds(openApiSpec, operationIds),
   });
 };
 
-type GlobalProps = 'subscriptionId' | 'apiManagementName' | 'resourceGroupName';
-
-type ApiConfig = Omit<ApiConfigFromSpec, 'openApiSpec' | GlobalProps>;
-
-interface ApiOptions {
+type ApiOptions = {
   apiBasePath?: string;
   apiName?: string;
-}
-
-interface PublishCommandOptions extends ApiOptions {
-  url?: string;
-  resourceGroupName: string;
-  apiManagementName: string;
-  subscriptionId?: string;
-  apiConfigPath?: string;
-}
+};
 
 const getDefaultApiFromOpenApiSpec = (
   doc: OpenAPIV2.Document,
@@ -137,9 +97,22 @@ const getDefaultApiFromOpenApiSpec = (
     description: doc.info.description,
     name: opts.apiName ?? doc.info.title,
     path: opts.apiBasePath ?? doc.info.title.toLocaleLowerCase(),
-    operationIds: [],
+    operationIds: null,
     products: [],
   };
+};
+
+/***********/
+/* COMMAND */
+/***********/
+
+type PublishCommandOptions = ApiOptions & {
+  url?: string;
+  resourceGroupName: string;
+  apiManagementName: string;
+  subscriptionId?: string;
+  apiConfigPath?: string;
+  apply: boolean;
 };
 
 export const publishAction = async (
@@ -153,21 +126,6 @@ export const publishAction = async (
   }: PublishCommandOptions,
   command: Command,
 ): Promise<void> => {
-  let apiConfigFromFile: ApiConfig[] | undefined = undefined;
-  if (apiConfigPath && !apiConfigPath.endsWith('.json')) {
-    program.error(
-      '\nThe api-config, if provided, must be the path to a json file.\n',
-    );
-  } else if (apiConfigPath) {
-    // TODO: validate file is according to expected spec
-    try {
-      apiConfigFromFile = require(apiConfigPath);
-    } catch (err) {
-      console.error(`\nFailed loading the api-config with error: ${err}.\n`);
-      command.help();
-    }
-  }
-
   if (!subscriptionId) {
     console.error(
       '\nAn Azure Subscription Id must be provided. See help below:\n',
@@ -175,28 +133,65 @@ export const publishAction = async (
     command.help();
   }
 
-  let openApiSpec: OpenAPIV2.Document | undefined = undefined;
-  if (url) {
-    const result = await axios.get<OpenAPIV2.Document>(url);
-    openApiSpec = result.data;
-  }
-
-  if (!openApiSpec) {
+  // fetch Open Api spec
+  if (!url) {
     console.error(
       '\nAn Open Api Spec must be provided as a publicly available url. See help below\n',
     );
     command.help();
   }
+  const result = await axios.get<OpenAPIV2.Document>(url);
+  const openApiSpec = result.data;
 
-  const apiConfigsFromFile: ApiConfig[] | undefined = apiConfigPath
-    ? apiConfigFromFile
-    : undefined;
-  const apiConfigs: ApiConfig[] = apiConfigsFromFile ?? [
-    getDefaultApiFromOpenApiSpec(openApiSpec, { apiBasePath, apiName }),
-  ];
+  // validate api config
+  let apiConfigsFromFile: ApiConfig[] | undefined = undefined;
+  if (apiConfigPath && !apiConfigPath.endsWith('.json')) {
+    console.error(
+      '\nThe api-config, if provided, must be the path to a json file.\n',
+    );
+    command.help();
+  } else if (apiConfigPath) {
+    // TODO: validate file is according to expected spec
+    try {
+      apiConfigsFromFile = require(apiConfigPath);
+      const error = validateApiConfigs(apiConfigsFromFile);
+      if (error) {
+        console.error(
+          `\nApi Config at "${apiConfigPath}" is not valid. Message: '${error.message}'.\n`,
+        );
+        console.log('Details:', error);
+        command.help();
+      }
+    } catch (err) {
+      console.error(`\nFailed loading the api-config with error: ${err}.\n`);
+      command.help();
+    }
+  } else {
+    apiConfigsFromFile = [
+      getDefaultApiFromOpenApiSpec(openApiSpec, { apiBasePath, apiName }),
+    ];
+    const error = validateApiConfigs(apiConfigsFromFile);
+    if (error) {
+      console.log(
+        '\nNo Api Config given. Attempted to use given Open Api specification to generate an Api Config.\n',
+      );
+      console.error(
+        `\nGenerated Api Config is not valid. Message '${error.message}'.\n`,
+      );
+      console.log('Details:', error);
+      command.help();
+    }
+  }
+  if (!apiConfigsFromFile) {
+    // this shouldn't happen - apiConfig is always given a value and validated above - but to satisfy typescript
+    console.error(
+      `Failed determining Api Config. Please open an issue at: https://github.com/tomaswalander/azure-and-devops-tools/issues`,
+    );
+    command.help();
+  }
 
   await Promise.all(
-    apiConfigs.map(api =>
+    apiConfigsFromFile.map(api =>
       publishApiFromSpec({
         ...rest,
         subscriptionId,

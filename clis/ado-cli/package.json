@@ -1,14 +1,17 @@
 {
   "name": "@twalander/ado-cli",
-  "version": "0.0.3",
+  "version": "0.0.7",
   "license": "MIT",
-  "description": "",
-  "private": true,
+  "description": "A cli for custom Azure and Azure DevOps things I find myself often doing in projects.",
+  "main": "lib/index.js",
+  "bin": {
+    "ado-cli": "lib/index.js"
+  },
   "scripts": {
-    "clean": "rimraf dist && rimraf tsconfig.tsbuildinfo",
+    "clean": "rimraf lib && rimraf tsconfig.tsbuildinfo",
     "build": "yarn clean && tsc -p .",
     "ts-check": "tsc --noEmit",
-    "ado-cli": "node dist/index.js",
+    "ado-cli": "node lib/index.js",
     "dev": "node -r ts-node/register src/index.ts"
   },
   "dependencies": {
@@ -17,10 +20,13 @@
     "axios": "^1.1.3",
     "chalk": "4.1.2",
     "commander": "^9.4.1",
-    "figlet": "^1.5.2"
+    "figlet": "^1.5.2",
+    "joi": "^17.7.0",
+    "openapi-types": "^12.0.2"
   },
   "devDependencies": {
     "@types/figlet": "^1.5.5",
+    "@types/joi": "^17.2.3",
     "@types/node": "^17.0.23",
     "copyfiles": "^2.4.1",
     "eslint": "^8.2.0",
