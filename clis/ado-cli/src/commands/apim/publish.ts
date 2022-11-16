@@ -35,6 +35,7 @@ const _publishApiToApim = async ({
   path,
   products,
   openApiSpec,
+  apply = false,
   parameters,
 }: PublishToApimOptions): Promise<void> => {
   const client = new ApiManagementClient(credential, subscriptionId);
@@ -48,23 +49,43 @@ const _publishApiToApim = async ({
     value: JSON.stringify(openApiSpec),
   };
 
-  await client.api.beginCreateOrUpdateAndWait(
-    resourceGroupName,
-    apiManagementName,
-    name,
-    finalParameters,
-  );
+  if (apply) {
+    await client.api.beginCreateOrUpdateAndWait(
+      resourceGroupName,
+      apiManagementName,
+      name,
+      finalParameters,
+    );
 
-  await Promise.all(
-    products.map(p =>
-      client.productApi.createOrUpdate(
-        resourceGroupName,
-        apiManagementName,
-        p,
-        name,
+    await Promise.all(
+      products.map(p =>
+        client.productApi.createOrUpdate(
+          resourceGroupName,
+          apiManagementName,
+          p,
+          name,
+        ),
       ),
-    ),
-  );
+    );
+  } else {
+    console.log(
+      'Would create the following API. Re-run with "--apply" to do it.',
+      {
+        input: {
+          subscriptionId,
+          resourceGroupName,
+          apiManagementName,
+          name,
+          displayName,
+          path,
+          products,
+          openApiSpec,
+          parameters,
+        },
+        output: finalParameters,
+      },
+    );
+  }
 };
 
 export const publishApiFromSpec = async ({

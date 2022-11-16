@@ -20,6 +20,8 @@ export interface PublishToApimOptions
   products: string[];
 
   parameters?: AdditionalParameters;
+
+  apply?: boolean;
 }
 
 export interface PublishToApimWithOperationIdFilterOptions
