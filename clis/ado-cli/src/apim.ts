@@ -25,14 +25,6 @@ withApimInstanceOptions(
     'A Url to a publicly accessible OpenApi specification to use',
   )
   .option(
-    '--api-base-path <string>',
-    'The base path to use for the crated Api. Must be unique within the Api Management instance.',
-  )
-  .option(
-    '--api-name <string>',
-    'The base path to use for the crated Api. Must be unique within the Api Management instance.',
-  )
-  .option(
     '-c, --api-config-path <string>',
     'A json-file containing api configuration for publishing multiple API:s for the same Open Api specification.',
   )

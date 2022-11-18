@@ -4,6 +4,10 @@
   "compilerOptions": {
     "composite": true,
     "outDir": "./lib",
-    "rootDir": "./src"
-  }
+    "rootDir": "./src",
+    "paths": {
+      "*": ["./src/@custom_types/*"]
+    },
+  },
+  "exclude": ["@custom_types"]
 }

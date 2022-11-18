@@ -5,7 +5,7 @@
     "compilerOptions": {
       "composite": true,
       "target": "es2015",
-      "module": "commonjs",
+      "module": "CommonJS",
       "allowJs": false,
       "moduleResolution": "node",
       "isolatedModules": true,

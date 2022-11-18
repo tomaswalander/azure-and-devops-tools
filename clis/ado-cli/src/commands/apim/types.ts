@@ -24,17 +24,19 @@ export interface PublishToApimOptions
   apply?: boolean;
 }
 
-export interface PublishToApimWithOperationIdFilterOptions
-  extends PublishToApimOptions {
-  operationIds: string[] | null;
-}
+export type PublishToApimWithOperationIdFilterOptions = PublishToApimOptions &
+  ApiConfig;
 
-export type GlobalProps =
-  | 'subscriptionId'
-  | 'apiManagementName'
-  | 'resourceGroupName';
+export type OperationConfig = {
+  id: string;
+};
 
-export type ApiConfig = Omit<
-  PublishToApimWithOperationIdFilterOptions,
-  'openApiSpec' | GlobalProps
->;
+export type ApiConfig = {
+  displayName: string;
+  description: string;
+  path: string;
+  operations: OperationConfig[] | null;
+  name: string;
+  products: string[];
+  parameters?: AdditionalParameters | undefined;
+};

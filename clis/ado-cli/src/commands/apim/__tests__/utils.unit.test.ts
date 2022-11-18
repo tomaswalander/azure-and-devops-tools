@@ -75,7 +75,7 @@ describe('utils', () => {
             displayName: 'Display',
             description: 'Description',
             path: 'path',
-            operationIds: null,
+            operations: null,
             name: 'Name',
             products: [],
             parameters: undefined,
@@ -84,7 +84,7 @@ describe('utils', () => {
             displayName: 'Utilities API',
             description: 'This Api is for utilities of the App',
             path: 'path-2',
-            operationIds: ['ping', 'health'],
+            operations: [{ id: 'ping' }, { id: 'health' }],
             name: 'Name 2',
             products: ['utilities'],
             parameters: undefined,
@@ -99,7 +99,7 @@ describe('utils', () => {
             displayName: 'Display',
             description: 'Description',
             path: 'path',
-            operationIds: null,
+            operations: null,
             name: 'Name',
             products: [],
             parameters: undefined,
@@ -108,7 +108,7 @@ describe('utils', () => {
             displayName: 'Utilities API',
             description: 'This Api is for utilities of the App',
             path: 'path',
-            operationIds: ['ping', 'health'],
+            operations: [{ id: 'ping' }, { id: 'health' }],
             name: 'Name 2',
             products: ['utilities'],
             parameters: undefined,
@@ -123,7 +123,7 @@ describe('utils', () => {
             displayName: 'Display',
             description: 'Description',
             path: 'path',
-            operationIds: null,
+            operations: null,
             name: 'Name',
             products: [],
             parameters: undefined,
@@ -132,7 +132,7 @@ describe('utils', () => {
             displayName: 'Utilities API',
             description: 'This Api is for utilities of the App',
             path: 'path-2',
-            operationIds: ['ping', 'health'],
+            operations: [{ id: 'ping' }, { id: 'health' }],
             name: 'Name',
             products: ['utilities'],
             parameters: undefined,
@@ -147,7 +147,7 @@ describe('utils', () => {
             displayName: 'Display',
             description: 'Description',
             path: 'path',
-            operationIds: null,
+            operations: null,
             name: 'Name',
             products: [],
             parameters: undefined,
@@ -156,7 +156,7 @@ describe('utils', () => {
             displayName: 'Display',
             description: 'This Api is for utilities of the App',
             path: 'path-2',
-            operationIds: ['ping', 'health'],
+            operations: [{ id: 'ping' }, { id: 'health' }],
             name: 'Name 2',
             products: ['utilities'],
             parameters: undefined,
@@ -171,7 +171,7 @@ describe('utils', () => {
             displayName: 'Display',
             description: 'Description',
             path: 'path',
-            operationIds: ['1', '1'],
+            operations: [{ id: '1' }, { id: '1' }],
             name: 'Name',
             products: [],
             parameters: undefined,
@@ -186,7 +186,7 @@ describe('utils', () => {
             displayName: 'Display',
             description: 'Description',
             path: 'path',
-            operationIds: null,
+            operations: null,
             name: 'Name',
             products: ['1', '1'],
             parameters: undefined,
@@ -208,7 +208,7 @@ describe('utils', () => {
             displayName,
             description: 'Description',
             path: 'path',
-            operationIds: null,
+            operations: null,
             name: 'Name',
             products: [],
             parameters: undefined,
@@ -235,7 +235,7 @@ describe('utils', () => {
             description,
             displayName: 'Display',
             path: 'path',
-            operationIds: null,
+            operations: null,
             name: 'Name',
             products: [],
             parameters: undefined,
@@ -260,7 +260,7 @@ describe('utils', () => {
           description: 'Description',
           displayName: 'Display',
           path: 'path',
-          operationIds: null,
+          operations: null,
           name,
           products: [],
           parameters: undefined,
@@ -284,7 +284,7 @@ describe('utils', () => {
           description: 'Description',
           displayName: 'Display',
           path,
-          operationIds: null,
+          operations: null,
           name: 'Name',
           products: [],
           parameters: undefined,
@@ -297,22 +297,22 @@ describe('utils', () => {
       }
     });
     it.each`
-      operationIds | result
-      ${null}      | ${true}
-      ${undefined} | ${false}
-      ${''}        | ${false}
-      ${[]}        | ${false}
-      ${['item']}  | ${true}
-      ${[1]}       | ${false}
+      operations          | result
+      ${null}             | ${true}
+      ${undefined}        | ${false}
+      ${''}               | ${false}
+      ${[]}               | ${false}
+      ${[{ id: 'item' }]} | ${true}
+      ${[{ id: 1 }]}      | ${false}
     `(
       'it should return $result when operationIds is "$operationIds"',
-      ({ operationIds, result }) => {
+      ({ operations, result }) => {
         const error = validateApiConfigs([
           {
             description: 'Description',
             displayName: 'Display',
             path: 'path',
-            operationIds,
+            operations,
             name: 'Name',
             products: [],
             parameters: undefined,
@@ -341,7 +341,7 @@ describe('utils', () => {
             description: 'Description',
             displayName: 'Display',
             path: 'path',
-            operationIds: null,
+            operations: null,
             name: 'Name',
             products,
             parameters: undefined,

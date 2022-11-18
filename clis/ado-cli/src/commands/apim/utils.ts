@@ -21,10 +21,10 @@ const apiConfigSchema = Joi.array()
       displayName: Joi.string().required(),
       description: Joi.string().required(),
       path: Joi.string().required(),
-      operationIds: Joi.array()
+      operations: Joi.array()
         .required()
         .min(1)
-        .items(Joi.string())
+        .items(Joi.object({ id: Joi.string().required() }))
         .unique()
         .allow(null),
       name: Joi.string().required(),
