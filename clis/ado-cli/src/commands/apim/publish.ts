@@ -1,3 +1,5 @@
+import fs from 'fs/promises';
+
 import axios from 'axios';
 import { Command } from 'commander';
 import { OpenAPIV2 } from 'openapi-types';
@@ -22,10 +24,16 @@ type PublishCommandOptions = {
   apply: boolean;
 };
 
+const readApiConfig = async (apiConfig: string): Promise<ApiConfig[]> => {
+  const fileContent = await fs.readFile(apiConfig, { encoding: 'utf8' });
+  return JSON.parse(fileContent);
+};
+
 export const publishAction = async (
   { apiConfigPath, subscriptionId, url, ...rest }: PublishCommandOptions,
   command: Command,
 ): Promise<void> => {
+  logger.info('options', { apiConfigPath, subscriptionId, url, rest });
   const printErrorHelpAndExit = (msg: string, details?: unknown): never => {
     logger.breakline();
     logger.err(msg, details);
@@ -44,7 +52,7 @@ export const publishAction = async (
 
   const result = await axios.get<OpenAPIV2.Document>(url);
   const openApiSpec = result.data;
-  // TODO validate open api spec on bare-minimum
+  logger.info('openApiSpec', { url, headers: result.headers, openApiSpec });
 
   // validate api config
   if (!apiConfigPath || !apiConfigPath.endsWith('.json')) {
@@ -52,28 +60,29 @@ export const publishAction = async (
       'The api-config must be a path to a json file.',
     );
   }
+  let apiConfigs: ApiConfig[] | undefined;
   try {
-    const apiConfigs: ApiConfig[] = (await import(apiConfigPath)).default;
-    const error = validateApiConfigs(apiConfigs);
-    if (error) {
-      return printErrorHelpAndExit(
-        `Api Config at "${apiConfigPath}" is not valid. Message: '${error.message}'.`,
-        { error },
-      );
-    }
-    await Promise.all(
-      apiConfigs.map(api =>
-        publishApiFromSpec({
-          ...rest,
-          subscriptionId,
-          openApiSpec: openApiSpec as OpenAPIV2.Document,
-          ...api,
-        }),
-      ),
-    );
+    apiConfigs = await readApiConfig(apiConfigPath);
   } catch (err) {
     return printErrorHelpAndExit(
-      `Failed loading the api-config with error: ${err}.`,
+      `Failed reading the api-config with error: ${err}.`,
     );
   }
+  const error = validateApiConfigs(apiConfigs);
+  if (error) {
+    return printErrorHelpAndExit(
+      `Api Config at "${apiConfigPath}" is not valid. Message: '${error.message}'.`,
+      { error },
+    );
+  }
+  await Promise.all(
+    apiConfigs.map(api =>
+      publishApiFromSpec({
+        ...rest,
+        subscriptionId,
+        openApiSpec: openApiSpec as OpenAPIV2.Document,
+        ...api,
+      }),
+    ),
+  );
 };
