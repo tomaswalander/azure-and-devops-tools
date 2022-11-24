@@ -24,22 +24,27 @@ type PublishCommandOptions = {
   apply: boolean;
 };
 
-const readApiConfig = async (apiConfig: string): Promise<ApiConfig[]> => {
-  const fileContent = await fs.readFile(apiConfig, { encoding: 'utf8' });
-  return JSON.parse(fileContent);
+const readApiConfig = async (path: string): Promise<ApiConfig[]> => {
+  const content = await fs.readFile(path, { encoding: 'utf8' });
+  logger.debug('Read api config', { path, content });
+
+  return JSON.parse(content);
 };
 
 export const publishAction = async (
-  { apiConfigPath, subscriptionId, url, ...rest }: PublishCommandOptions,
+  opts: PublishCommandOptions,
   command: Command,
 ): Promise<void> => {
-  logger.info('options', { apiConfigPath, subscriptionId, url, rest });
+  logger.debug('Initialised with options', opts);
+  const { apiConfigPath, subscriptionId, url, ...rest } = opts;
+
   const printErrorHelpAndExit = (msg: string, details?: unknown): never => {
     logger.breakline();
     logger.err(msg, details);
     logger.breakline();
     command.help({ error: true });
   };
+
   if (!subscriptionId) {
     return printErrorHelpAndExit('An Azure Subscription Id must be provided..');
   }
@@ -52,7 +57,11 @@ export const publishAction = async (
 
   const result = await axios.get<OpenAPIV2.Document>(url);
   const openApiSpec = result.data;
-  logger.info('openApiSpec', { url, headers: result.headers, openApiSpec });
+  logger.debug('Fetched OpenApi specification', {
+    url,
+    headers: result.headers,
+    data: openApiSpec,
+  });
 
   // validate api config
   if (!apiConfigPath || !apiConfigPath.endsWith('.json')) {

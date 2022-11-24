@@ -1,6 +1,6 @@
 {
   "name": "@twalander/ado-cli",
-  "version": "0.0.18",
+  "version": "0.0.21",
   "license": "MIT",
   "description": "A cli for custom Azure and Azure DevOps things I find myself often doing in projects.",
   "repository": "github:tomaswalander/azure-and-devops-tools",
@@ -18,7 +18,7 @@
   "dependencies": {
     "@azure/arm-apimanagement": "^8.1.2",
     "@azure/identity": "^3.1.0",
-    "axios": "^1.1.3",
+    "axios": "1.1.3",
     "chalk": "4.1.2",
     "commander": "^9.4.1",
     "figlet": "^1.5.2",
