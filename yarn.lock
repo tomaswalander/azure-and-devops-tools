@@ -833,7 +833,7 @@
 
 "@twalander/ado-cli@file:/Users/twal/Projects/private/azure-and-devops-tools/clis/ado-cli":
   "resolved" "file:clis/ado-cli"
-  "version" "0.0.22"
+  "version" "0.0.23"
   dependencies:
     "@azure/arm-apimanagement" "^8.1.2"
     "@azure/identity" "^3.1.0"
