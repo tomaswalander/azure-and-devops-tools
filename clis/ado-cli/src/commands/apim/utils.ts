@@ -1,7 +1,10 @@
 import Joi, { ValidationError } from 'joi';
 import { OpenAPIV2 } from 'openapi-types';
 
+import { createLogger } from '../../logger';
 import { ApiConfig } from './types';
+
+const logger = createLogger();
 
 type OpenApiV2Paths = OpenAPIV2.Document['paths'];
 
@@ -43,26 +46,13 @@ export const validateApiConfigs = (
   return result.error;
 };
 
-const checkOperationIdOnMethod = (
-  operationIds: string[],
-  pathItemObject: OpenAPIV2.PathItemObject,
-  method: OpenAPIV2.HttpMethods,
-): OpenAPIV2.OperationObject | undefined => {
-  const operationId =
-    pathItemObject && pathItemObject[method]
-      ? pathItemObject[method]?.operationId
-      : undefined;
-  if (operationId && operationIds.includes(operationId)) {
-    return pathItemObject[method];
-  }
-  return undefined;
-};
-
 export const filterOpenApiSpecByOperationIds = (
+  apiName: string,
   openApiSpec: OpenAPIV2.Document,
-  operationIds: null | string[],
+  requestedOperationIds: null | string[],
 ): OpenAPIV2.Document => {
-  if (!operationIds) {
+  const openApiSpecAllOperationIds: string[] = [];
+  if (!requestedOperationIds) {
     return openApiSpec;
   }
   const filteredOpenApiSpec: OpenAPIV2.Document = {
@@ -72,13 +62,24 @@ export const filterOpenApiSpecByOperationIds = (
         const pathItemObject = openApiSpec.paths[path];
         const filteredPathItemObject: OpenAPIV2.PathItemObject = {};
         methodsToCheck.forEach(method => {
-          const result = checkOperationIdOnMethod(
-            operationIds,
-            pathItemObject,
-            method,
-          );
-          if (result) {
-            filteredPathItemObject[method] = result;
+          const operationId = pathItemObject[method]?.operationId;
+          if (operationId) {
+            openApiSpecAllOperationIds.push(operationId);
+            if (requestedOperationIds.includes(operationId)) {
+              filteredPathItemObject[method] = pathItemObject[method];
+            } else {
+              logger.info(
+                `[${apiName}] SKIPPED: ${method.toLocaleUpperCase()} ${path} due to specified operation ids`,
+              );
+            }
+          } else if (pathItemObject[method]) {
+            logger.warn(
+              `[${apiName}] Operation ${method.toLocaleUpperCase()} ${path} is missing the id property`,
+            );
+          } else {
+            logger.debug(
+              `[${apiName}] SKIPPED: ${method.toLocaleUpperCase()} ${path} due to method not allowed for path.`,
+            );
           }
         });
 
@@ -91,6 +92,16 @@ export const filterOpenApiSpecByOperationIds = (
       {} as OpenApiV2Paths,
     ),
   };
+
+  const missingOperationIds = requestedOperationIds.filter(
+    i => !openApiSpecAllOperationIds.includes(i),
+  );
+  if (missingOperationIds.length > 0) {
+    logger.warn(
+      `[${apiName}] At least one requested operation is not available in the OpenApi spec. If the missing operations are added in this release this should be safe to ignore.`,
+      { missingOperationIds },
+    );
+  }
 
   return filteredOpenApiSpec;
 };

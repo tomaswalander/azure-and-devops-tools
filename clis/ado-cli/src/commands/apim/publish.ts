@@ -15,13 +15,13 @@ const logger = createLogger();
 /* COMMAND */
 /***********/
 
-type PublishCommandOptions = {
+export type ApimPublishCommandOptions = {
+  mode: 'validate' | 'apply';
   url?: string;
   resourceGroupName: string;
   apiManagementName: string;
   subscriptionId?: string;
   apiConfigPath?: string;
-  apply: boolean;
 };
 
 const readApiConfig = async (path: string): Promise<ApiConfig[]> => {
@@ -31,14 +31,15 @@ const readApiConfig = async (path: string): Promise<ApiConfig[]> => {
   return JSON.parse(content);
 };
 
-export const publishAction = async (
-  opts: PublishCommandOptions,
+export const validateOrPublishAction = async (
+  opts: ApimPublishCommandOptions,
   command: Command,
 ): Promise<void> => {
   logger.debug('Initialised with options', opts);
-  const { apiConfigPath, subscriptionId, url, ...rest } = opts;
+  const { mode, apiConfigPath, subscriptionId, url, ...rest } = opts;
+  const shouldApply = mode === 'apply';
 
-  const printErrorHelpAndExit = (msg: string, details?: unknown): never => {
+  const printError = (msg: string, details?: unknown) => {
     logger.breakline();
     logger.err(msg, details);
     logger.breakline();
@@ -46,13 +47,18 @@ export const publishAction = async (
   };
 
   if (!subscriptionId) {
-    return printErrorHelpAndExit('An Azure Subscription Id must be provided..');
+    printError('An Azure Subscription Id must be provided.');
+    return;
   }
-  // fetch Open Api spec
   if (!url) {
-    return printErrorHelpAndExit(
+    printError(
       'An Open Api Spec must be provided as a publicly available url.',
     );
+    return;
+  }
+  if (!apiConfigPath || !apiConfigPath.endsWith('.json')) {
+    printError('The api-config must be a path to a json file.');
+    return;
   }
 
   const result = await axios.get<OpenAPIV2.Document>(url);
@@ -63,23 +69,15 @@ export const publishAction = async (
     data: openApiSpec,
   });
 
-  // validate api config
-  if (!apiConfigPath || !apiConfigPath.endsWith('.json')) {
-    return printErrorHelpAndExit(
-      'The api-config must be a path to a json file.',
-    );
-  }
   let apiConfigs: ApiConfig[] | undefined;
   try {
     apiConfigs = await readApiConfig(apiConfigPath);
   } catch (err) {
-    return printErrorHelpAndExit(
-      `Failed reading the api-config with error: ${err}.`,
-    );
+    return printError(`Failed reading the api-config with error: ${err}.`);
   }
   const error = validateApiConfigs(apiConfigs);
   if (error) {
-    return printErrorHelpAndExit(
+    return printError(
       `Api Config at "${apiConfigPath}" is not valid. Message: '${error.message}'.`,
       { error },
     );
@@ -88,9 +86,10 @@ export const publishAction = async (
     apiConfigs.map(api =>
       publishApiFromSpec({
         ...rest,
+        ...api,
+        apply: shouldApply,
         subscriptionId,
         openApiSpec: openApiSpec as OpenAPIV2.Document,
-        ...api,
       }),
     ),
   );

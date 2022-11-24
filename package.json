@@ -19,6 +19,7 @@
     "clean": "yarn workspaces run clean",
     "build": "yarn workspaces run build",
     "format": "prettier --check **/*.ts",
+    "format:fix": "prettier --write **/*.ts",
     "lint": "eslint . --format unix --ext .js,.ts --max-warnings=0",
     "prepare": "husky install",
     "test": "jest -c ./jest.unit.config.js",

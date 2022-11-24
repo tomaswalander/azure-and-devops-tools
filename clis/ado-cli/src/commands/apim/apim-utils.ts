@@ -69,7 +69,7 @@ const _publishApiToApim = async ({
     );
   } else {
     logger.info(
-      'Would create the following API. Re-run with "--apply" to do it.',
+      'Would create the following API. Re-run with "--mode=apply" to do it.',
       {
         input: {
           subscriptionId,
@@ -96,6 +96,7 @@ export const publishApiFromSpec = async ({
   _publishApiToApim({
     ...rest,
     openApiSpec: filterOpenApiSpecByOperationIds(
+      rest.name,
       openApiSpec,
       operations?.map(({ id }) => id) ?? [],
     ),

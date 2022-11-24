@@ -21,7 +21,7 @@ export interface PublishToApimOptions
 
   parameters?: AdditionalParameters;
 
-  apply?: boolean;
+  apply: boolean;
 }
 
 export type PublishToApimWithOperationIdFilterOptions = PublishToApimOptions &

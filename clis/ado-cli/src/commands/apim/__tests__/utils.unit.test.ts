@@ -1,16 +1,30 @@
 import { filterOpenApiSpecByOperationIds, validateApiConfigs } from '../utils';
 
+jest.mock('../../../logger', () => ({
+  createLogger: jest.fn(() => ({
+    info: jest.fn(),
+    debug: jest.fn(),
+    err: jest.fn(),
+    breakline: jest.fn(),
+  })),
+}));
+
 describe('utils', () => {
   describe('filterOpenApiSpecByOperationIds', () => {
     it('should return the spec as is if operationIds is null', () => {
-      const result = filterOpenApiSpecByOperationIds(openApiSpecExample, null);
+      const result = filterOpenApiSpecByOperationIds(
+        'test',
+        openApiSpecExample,
+        null,
+      );
       expect(result).toStrictEqual(openApiSpecExample);
     });
     it('should return only the specified operation ids: ping and list-resources', () => {
-      const result = filterOpenApiSpecByOperationIds(openApiSpecExample, [
-        'ping',
-        'list-resources',
-      ]);
+      const result = filterOpenApiSpecByOperationIds(
+        'test',
+        openApiSpecExample,
+        ['ping', 'list-resources'],
+      );
       expect(result.paths['/ping'].get).toBeDefined();
       expect(result.paths['/health']).toBeUndefined();
       expect(result.paths['/v1/resources'].post).toBeUndefined();
@@ -21,10 +35,11 @@ describe('utils', () => {
       expect(result).toMatchSnapshot();
     });
     it('should return only the specified operation ids: create-resource and list-resources', () => {
-      const result = filterOpenApiSpecByOperationIds(openApiSpecExample, [
-        'create-resource',
-        'list-resources',
-      ]);
+      const result = filterOpenApiSpecByOperationIds(
+        'test',
+        openApiSpecExample,
+        ['create-resource', 'list-resources'],
+      );
       expect(result.paths['/ping']).toBeUndefined();
       expect(result.paths['/health']).toBeUndefined();
       expect(result.paths['/v1/resources'].post).toBeDefined();
@@ -35,12 +50,16 @@ describe('utils', () => {
       expect(result).toMatchSnapshot();
     });
     it('should return only the specified operation ids: create-, list-, update- and delete-resource', () => {
-      const result = filterOpenApiSpecByOperationIds(openApiSpecExample, [
-        'create-resource',
-        'list-resources',
-        'delete-resource',
-        'update-resource',
-      ]);
+      const result = filterOpenApiSpecByOperationIds(
+        'test',
+        openApiSpecExample,
+        [
+          'create-resource',
+          'list-resources',
+          'delete-resource',
+          'update-resource',
+        ],
+      );
       expect(result.paths['/ping']).toBeUndefined();
       expect(result.paths['/health']).toBeUndefined();
       expect(result.paths['/v1/resources'].post).toBeDefined();
@@ -51,12 +70,11 @@ describe('utils', () => {
       expect(result).toMatchSnapshot();
     });
     it('should return only the specified operation ids: health, create-, update- and delete-resource', () => {
-      const result = filterOpenApiSpecByOperationIds(openApiSpecExample, [
-        'health',
-        'create-resource',
-        'delete-resource',
-        'update-resource',
-      ]);
+      const result = filterOpenApiSpecByOperationIds(
+        'test',
+        openApiSpecExample,
+        ['health', 'create-resource', 'delete-resource', 'update-resource'],
+      );
       expect(result.paths['/ping']).toBeUndefined();
       expect(result.paths['/health'].get).toBeDefined();
       expect(result.paths['/v1/resources'].post).toBeDefined();
