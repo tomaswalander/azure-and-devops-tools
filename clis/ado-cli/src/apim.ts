@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 
-import commander, { Option } from 'commander';
-
+import { createCommand, Option } from './command';
 import { validateOrPublishAction } from './commands/apim/publish';
 import { withApimInstanceOptions } from './options';
 
-const program = new commander.Command();
+const program = createCommand();
 
 program.name('apim').description('Tools for working with Api Management.');
 

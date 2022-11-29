@@ -1,8 +1,6 @@
 {
   "extends": "./../../tsconfig.json",
-  "references": [{
-    "path": "./../../packages/apim"
-  }],
+  "references": [],
   "compilerOptions": {
     "composite": true,
     "outDir": "./lib",

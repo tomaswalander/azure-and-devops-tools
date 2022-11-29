@@ -16,6 +16,9 @@
       "allowUnreachableCode": false,
       "skipLibCheck": true
     },
-    "references": [],
+    "references": [
+      { "path": "./clis/**" },
+      { "path": "./packages/**" }
+    ],
   }
   
