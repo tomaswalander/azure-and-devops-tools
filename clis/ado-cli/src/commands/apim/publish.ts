@@ -47,12 +47,14 @@ export const validateAction = async (
     printError('An Azure Subscription Id must be provided.');
     return;
   }
+
   if (!url) {
     printError(
       'An Open Api Spec must be provided as a publicly available url.',
     );
     return;
   }
+
   if (!apiConfigPath || !apiConfigPath.endsWith('.json')) {
     printError('The api-config must be a path to a json file.');
     return;

@@ -1,0 +1,19 @@
+{
+  "name": "@twalander-packages/logger",
+  "version": "0.0.0",
+  "license": "MIT",
+  "description": "A logger library",
+  "main": "./src/index.ts",
+  "private": true,
+  "scripts" : {
+    "clean": "rimraf dist && rimraf tsconfig.tsbuildinfo",
+    "build": "yarn clean && tsc",
+    "lint": "eslint . --format unix --ext .js,.ts --max-warnings=0",
+    "ts-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "chalk": "4.1.2",
+    "log-driver": "^1.2.7"
+  },
+  "devDependencies": {}
+}
