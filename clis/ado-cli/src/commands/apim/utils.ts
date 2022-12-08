@@ -2,7 +2,7 @@ import Joi, { ValidationError } from 'joi';
 import { OpenAPIV2 } from 'openapi-types';
 
 import { createLogger } from '../../logger';
-import { ApiConfig } from './types';
+import { ApiConfig, OpenApiSpec } from './types';
 
 const logger = createLogger();
 
@@ -17,6 +17,7 @@ const methodsToCheck = [
   OpenAPIV2.HttpMethods.HEAD,
   OpenAPIV2.HttpMethods.OPTIONS,
 ];
+
 const apiConfigSchema = Joi.array()
   .required()
   .items(
@@ -24,6 +25,7 @@ const apiConfigSchema = Joi.array()
       displayName: Joi.string().required(),
       description: Joi.string().required(),
       path: Joi.string().required(),
+      servicePathSuffix: Joi.string().pattern(/^[a-z0-9]+[\\/[\-a-z0-9]+]*$/),
       operations: Joi.array()
         .required()
         .min(1)
@@ -48,14 +50,14 @@ export const validateApiConfigs = (
 
 export const filterOpenApiSpecByOperationIds = (
   apiName: string,
-  openApiSpec: OpenAPIV2.Document,
+  openApiSpec: OpenApiSpec,
   requestedOperationIds: null | string[],
-): OpenAPIV2.Document => {
+): OpenApiSpec => {
   const openApiSpecAllOperationIds: string[] = [];
   if (!requestedOperationIds) {
     return openApiSpec;
   }
-  const filteredOpenApiSpec: OpenAPIV2.Document = {
+  const filteredOpenApiSpec: OpenApiSpec = {
     ...openApiSpec,
     paths: Object.keys(openApiSpec.paths).reduce(
       (previous: OpenApiV2Paths, path: string) => {

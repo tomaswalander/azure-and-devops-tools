@@ -10,6 +10,8 @@ jest.mock('../../../logger', () => ({
     debug: jest.fn(),
     err: jest.fn(),
     breakline: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
   })),
 }));
 jest.mock('fs/promises', () => ({

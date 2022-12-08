@@ -26,6 +26,27 @@ const credential =
 
 const logger = createLogger();
 
+const getServiceUrl = (
+  host: string,
+  ...pathFragments: Array<string | undefined>
+): string => {
+  if (!host.startsWith('https://')) {
+    host = `https://${host}`;
+  }
+  return pathFragments.reduce((prev, curr) => {
+    if (!curr) {
+      return prev;
+    }
+    if (curr.startsWith('/')) {
+      curr = curr.substring(1);
+    }
+    if (curr.endsWith('/')) {
+      curr = curr.substring(0, -1);
+    }
+    return `${prev}/${curr}`;
+  }, host) as string;
+};
+
 const _publishApiToApim = async ({
   subscriptionId,
   resourceGroupName,
@@ -33,6 +54,7 @@ const _publishApiToApim = async ({
   name,
   displayName,
   path,
+  servicePathSuffix,
   products,
   openApiSpec,
   apply = false,
@@ -40,12 +62,19 @@ const _publishApiToApim = async ({
 }: PublishToApimOptions): Promise<void> => {
   const client = new ApiManagementClient(credential, subscriptionId);
 
+  const serviceUrl = getServiceUrl(
+    openApiSpec.host,
+    openApiSpec.basePath,
+    servicePathSuffix,
+  );
+
   const finalParameters: ApiCreateOrUpdateParameter = {
     ...parameters,
     displayName,
     path,
     protocols: ['https'],
     format: 'openapi+json',
+    serviceUrl,
     value: JSON.stringify(openApiSpec),
   };
 

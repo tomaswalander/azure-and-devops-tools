@@ -9,6 +9,8 @@ type AdditionalParameters = Omit<
   NonChangeableProps | ApimMandatoryProps
 >;
 
+export type OpenApiSpec = OpenAPIV2.Document & { host: string };
+
 export interface PublishToApimOptions
   extends Required<Pick<ApiCreateOrUpdateParameter, ApimMandatoryProps>> {
   subscriptionId: string;
@@ -16,8 +18,9 @@ export interface PublishToApimOptions
   apiManagementName: string;
 
   name: string;
-  openApiSpec: OpenAPIV2.Document;
+  openApiSpec: OpenApiSpec;
   products: string[];
+  servicePathSuffix?: string;
 
   parameters?: AdditionalParameters;
 
@@ -35,6 +38,7 @@ export type ApiConfig = {
   displayName: string;
   description: string;
   path: string;
+  servicePathSuffix?: string;
   operations: OperationConfig[] | null;
   name: string;
   products: string[];

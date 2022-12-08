@@ -2,11 +2,10 @@ import fs from 'fs/promises';
 
 import axios from 'axios';
 import { Command } from 'commander';
-import { OpenAPIV2 } from 'openapi-types';
 
 import { createLogger } from '../../logger';
 import { publishApiFromSpec } from './apim-utils';
-import { ApiConfig } from './types';
+import { ApiConfig, OpenApiSpec } from './types';
 import { validateApiConfigs } from './utils';
 
 const logger = createLogger();
@@ -121,9 +120,9 @@ export const publishAction = async (
     );
   }
 
-  let openApiSpec: OpenAPIV2.Document | undefined;
+  let openApiSpec: OpenApiSpec | undefined;
   try {
-    const result = await axios.get<OpenAPIV2.Document>(url);
+    const result = await axios.get<OpenApiSpec>(url);
     openApiSpec = result.data;
     logger.debug('Fetched OpenApi specification', {
       url,
@@ -144,7 +143,7 @@ export const publishAction = async (
         ...api,
         apply: true,
         subscriptionId,
-        openApiSpec: openApiSpec as OpenAPIV2.Document,
+        openApiSpec: openApiSpec as OpenApiSpec,
       }),
     ),
   );

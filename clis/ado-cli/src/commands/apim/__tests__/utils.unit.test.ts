@@ -102,6 +102,7 @@ describe('utils', () => {
             displayName: 'Utilities API',
             description: 'This Api is for utilities of the App',
             path: 'path-2',
+            servicePathSuffix: 'admin',
             operations: [{ id: 'ping' }, { id: 'health' }],
             name: 'Name 2',
             products: ['utilities'],
@@ -362,6 +363,39 @@ describe('utils', () => {
             operations: null,
             name: 'Name',
             products,
+            parameters: undefined,
+          },
+        ]);
+        if (result) {
+          expect(error).toBeUndefined();
+        } else {
+          expect(error).toBeDefined();
+        }
+      },
+    );
+    it.each`
+      servicePathSuffix                                   | result
+      ${null}                                             | ${false}
+      ${''}                                               | ${false}
+      ${[]}                                               | ${false}
+      ${1}                                                | ${false}
+      ${'/admin'}                                         | ${false}
+      ${undefined}                                        | ${true}
+      ${'admin'}                                          | ${true}
+      ${'subset/api'}                                     | ${true}
+      ${'suffix-with-hyphens/and-slashes-and-numbers/v1'} | ${true}
+    `(
+      'it should return $result when servicePathSuffix is "$servicePathSuffix"',
+      ({ servicePathSuffix, result }) => {
+        const error = validateApiConfigs([
+          {
+            description: 'Description',
+            displayName: 'Display',
+            path: 'path',
+            servicePathSuffix,
+            operations: null,
+            name: 'Name',
+            products: [],
             parameters: undefined,
           },
         ]);
