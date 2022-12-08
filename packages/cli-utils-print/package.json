@@ -1,0 +1,20 @@
+{
+  "name": "@twalander-packages/cli-utils-print",
+  "version": "0.0.0",
+  "license": "MIT",
+  "description": "A library with utils for printing information in cli",
+  "main": "./src/index.ts",
+  "private": true,
+  "scripts": {
+    "clean": "rimraf dist && rimraf tsconfig.tsbuildinfo",
+    "build": "yarn clean && tsc",
+    "lint": "eslint . --format unix --ext .js,.ts --max-warnings=0",
+    "ts-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "cli-table": "^0.3.11"
+  },
+  "devDependencies": {
+    "@types/cli-table": "^0.3.1"
+  }
+}

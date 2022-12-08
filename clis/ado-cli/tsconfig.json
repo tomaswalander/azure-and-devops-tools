@@ -1,6 +1,8 @@
 {
   "extends": "./../../tsconfig.json",
-  "references": [],
+  "references": [{
+    "path": "./../../packages/cli-utils-prompt"
+  }],
   "compilerOptions": {
     "composite": true,
     "outDir": "./lib",

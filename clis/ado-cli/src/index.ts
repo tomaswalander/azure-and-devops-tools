@@ -17,6 +17,9 @@ program
   )
   .command('apim', 'Tools for working with Api Management.', {
     executableFile: './apim',
+  })
+  .command('source-control', 'Tools for working with Api Management.', {
+    executableFile: './source-control/source-control',
   });
 
 program.parse(process.argv);

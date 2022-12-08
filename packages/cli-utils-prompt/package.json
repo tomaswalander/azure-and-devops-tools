@@ -1,0 +1,20 @@
+{
+  "name": "@twalander-packages/cli-utils-prompt",
+  "version": "0.0.0",
+  "license": "MIT",
+  "description": "A library with utils for prompting for information form a cli",
+  "main": "./src/index.ts",
+  "private": true,
+  "scripts" : {
+    "clean": "rimraf dist && rimraf tsconfig.tsbuildinfo",
+    "build": "yarn clean && tsc",
+    "lint": "eslint . --format unix --ext .js,.ts --max-warnings=0",
+    "ts-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/prompts": "^2.4.1"
+  }
+}
