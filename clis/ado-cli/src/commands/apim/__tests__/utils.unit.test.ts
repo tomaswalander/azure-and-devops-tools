@@ -1,4 +1,10 @@
-import { filterOpenApiSpecByOperationIds, validateApiConfigs } from '../utils';
+import {
+  dropPrefixFromPaths,
+  filterOpenApiSpecByOperationIds,
+  hasDuplicatePathAfterPrefixDrop,
+  pathSlashTrim,
+  validateApiConfigs,
+} from '../utils';
 
 jest.mock('../../../logger', () => ({
   createLogger: jest.fn(() => ({
@@ -85,6 +91,7 @@ describe('utils', () => {
       expect(result).toMatchSnapshot();
     });
   });
+
   describe('validateApiConfig', () => {
     it('should return true for valid config', () => {
       expect(
@@ -102,7 +109,8 @@ describe('utils', () => {
             displayName: 'Utilities API',
             description: 'This Api is for utilities of the App',
             path: 'path-2',
-            servicePathSuffix: 'admin',
+            serviceUrlSuffix: 'admin',
+            dropRoutePrefix: undefined,
             operations: [{ id: 'ping' }, { id: 'health' }],
             name: 'Name 2',
             products: ['utilities'],
@@ -374,7 +382,7 @@ describe('utils', () => {
       },
     );
     it.each`
-      servicePathSuffix                                   | result
+      serviceUrlSuffix                                    | result
       ${null}                                             | ${false}
       ${''}                                               | ${false}
       ${[]}                                               | ${false}
@@ -385,14 +393,14 @@ describe('utils', () => {
       ${'subset/api'}                                     | ${true}
       ${'suffix-with-hyphens/and-slashes-and-numbers/v1'} | ${true}
     `(
-      'it should return $result when servicePathSuffix is "$servicePathSuffix"',
-      ({ servicePathSuffix, result }) => {
+      'it should return $result when serviceUrlSuffix is "$serviceUrlSuffix"',
+      ({ serviceUrlSuffix, result }) => {
         const error = validateApiConfigs([
           {
             description: 'Description',
             displayName: 'Display',
             path: 'path',
-            servicePathSuffix,
+            serviceUrlSuffix,
             operations: null,
             name: 'Name',
             products: [],
@@ -406,6 +414,112 @@ describe('utils', () => {
         }
       },
     );
+    it.each`
+      dropRoutePrefix                                     | result
+      ${null}                                             | ${false}
+      ${[]}                                               | ${false}
+      ${1}                                                | ${false}
+      ${''}                                               | ${true}
+      ${'/admin'}                                         | ${true}
+      ${undefined}                                        | ${true}
+      ${'admin'}                                          | ${true}
+      ${'subset/api'}                                     | ${true}
+      ${'suffix-with-hyphens/and-slashes-and-numbers/v1'} | ${true}
+    `(
+      'it should return $result when dropRoutePrefix is "$dropRoutePrefix"',
+      ({ dropRoutePrefix, result }) => {
+        const error = validateApiConfigs([
+          {
+            description: 'Description',
+            displayName: 'Display',
+            path: 'path',
+            serviceUrlSuffix: 'admin',
+            dropRoutePrefix,
+            operations: null,
+            name: 'Name',
+            products: [],
+            parameters: undefined,
+          },
+        ]);
+        if (result) {
+          expect(error).toBeUndefined();
+        } else {
+          expect(error).toBeDefined();
+        }
+      },
+    );
+  });
+
+  describe('pathSlashTrim', () => {
+    it.each`
+      subject        | result
+      ${''}          | ${''}
+      ${'/'}         | ${''}
+      ${'//'}        | ${''}
+      ${'abc'}       | ${'abc'}
+      ${'/abc'}      | ${'abc'}
+      ${'/abc/'}     | ${'abc'}
+      ${'abc/'}      | ${'abc'}
+      ${'abc-def'}   | ${'abc-def'}
+      ${'abc/def'}   | ${'abc/def'}
+      ${'/abc/def'}  | ${'abc/def'}
+      ${'/abc/def/'} | ${'abc/def'}
+      ${'abc/def/'}  | ${'abc/def'}
+    `('It should return "$result" for "$subject"', ({ subject, result }) => {
+      expect(pathSlashTrim(subject)).toBe(result);
+    });
+  });
+
+  describe('hasDuplicatePathAfterPrefixDrop', () => {
+    it.each`
+      items                                   | prefix          | result
+      ${[]}                                   | ${''}           | ${false}
+      ${['a', 'b']}                           | ${''}           | ${false}
+      ${['a', 'a']}                           | ${''}           | ${true}
+      ${['before/a', 'before/b', 'before/c']} | ${'not-before'} | ${false}
+      ${['before/a', 'before/b', 'before/c']} | ${'before'}     | ${false}
+      ${['before/a', 'before/b', 'before/a']} | ${'before'}     | ${true}
+      ${['a', 'a']}                           | ${''}           | ${true}
+      ${['internal/a', 'a']}                  | ${'/internal'}  | ${true}
+      ${['internal/a', 'a']}                  | ${'internal'}   | ${true}
+      ${['internal/a', 'a']}                  | ${'internal/'}  | ${true}
+      ${['internal/a', 'a']}                  | ${'/internal/'} | ${true}
+      ${['/internal/a', '/a']}                | ${'/internal'}  | ${true}
+      ${['/internal/a', '/a']}                | ${'internal'}   | ${true}
+      ${['/internal/a', '/a']}                | ${'internal/'}  | ${true}
+      ${['/internal/a', '/a']}                | ${'/internal/'} | ${true}
+      ${['/internal/a/', '/a']}               | ${'/internal'}  | ${true}
+      ${['/internal/a/', '/a']}               | ${'/internal'}  | ${true}
+      ${['/internal/a/', '/a']}               | ${'internal'}   | ${true}
+      ${['/internal/a/', '/a']}               | ${'internal'}   | ${true}
+      ${['/internal/a', 'a']}                 | ${'internal/'}  | ${true}
+      ${['/internal/a', 'a']}                 | ${'internal/'}  | ${true}
+      ${['/internal/a', 'a']}                 | ${'/internal/'} | ${true}
+      ${['/internal/a', 'a']}                 | ${'/internal/'} | ${true}
+      ${['/internal/a/b/c/', 'a/b/c']}        | ${'internal/'}  | ${true}
+      ${['/internal/a/b/c/', 'a/b/c']}        | ${'internal/'}  | ${true}
+      ${['/internal/a/b/c/', 'a/b/c']}        | ${'/internal/'} | ${true}
+      ${['/internal/a/b/c/', 'a/b/c']}        | ${'/internal/'} | ${true}
+      ${['/internal/a/b/c/', 'ab/c']}         | ${'/internal/'} | ${false}
+      ${['/internal/a/b/c/', 'abc']}          | ${'/internal/'} | ${false}
+    `(
+      'It should return $result when items are $items and prefix is "$prefix"',
+      ({ items, prefix, result }) => {
+        expect(hasDuplicatePathAfterPrefixDrop(items, prefix)).toBe(result);
+      },
+    );
+  });
+
+  describe('dropPrefixFromPaths', () => {
+    it('should drop v1 from all paths', () => {
+      const result = dropPrefixFromPaths(openApiSpecExample, 'v1');
+      const paths = Object.keys(result.paths);
+      expect(paths).toHaveLength(4);
+      expect(paths).toContain('/ping');
+      expect(paths).toContain('/health');
+      expect(paths).toContain('/resources');
+      expect(paths).toContain('/other-resources');
+    });
   });
 });
 
@@ -453,6 +567,28 @@ const openApiSpecExample = {
       delete: {
         tags: ['Resources'],
         operationId: 'delete-resource',
+        responses: {},
+      },
+    },
+    '/v1/other-resources': {
+      get: {
+        tags: ['Resources'],
+        operationId: 'list-other-resources',
+        responses: {},
+      },
+      post: {
+        tags: ['Resources'],
+        operationId: 'create-other-resource',
+        responses: {},
+      },
+      put: {
+        tags: ['Resources'],
+        operationId: 'update-other-resource',
+        responses: {},
+      },
+      delete: {
+        tags: ['Resources'],
+        operationId: 'delete-other-resource',
         responses: {},
       },
     },

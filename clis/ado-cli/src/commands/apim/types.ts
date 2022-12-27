@@ -20,7 +20,8 @@ export interface PublishToApimOptions
   name: string;
   openApiSpec: OpenApiSpec;
   products: string[];
-  servicePathSuffix?: string;
+  serviceUrlSuffix?: string;
+  dropRoutePrefix?: string;
 
   parameters?: AdditionalParameters;
 
@@ -38,7 +39,8 @@ export type ApiConfig = {
   displayName: string;
   description: string;
   path: string;
-  servicePathSuffix?: string;
+  serviceUrlSuffix?: string;
+  dropRoutePrefix?: string;
   operations: OperationConfig[] | null;
   name: string;
   products: string[];

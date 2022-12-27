@@ -13,7 +13,12 @@ import {
   PublishToApimOptions,
   PublishToApimWithOperationIdFilterOptions,
 } from './types';
-import { filterOpenApiSpecByOperationIds } from './utils';
+import {
+  dropPrefixFromPaths,
+  filterOpenApiSpecByOperationIds,
+  hasDuplicatePathAfterPrefixDrop,
+  pathSlashTrim,
+} from './utils';
 
 const credential =
   process.env.TENANT_ID && process.env.CLIENT_ID && process.env.CLIENT_SECRET
@@ -37,12 +42,7 @@ const getServiceUrl = (
     if (!curr) {
       return prev;
     }
-    if (curr.startsWith('/')) {
-      curr = curr.substring(1);
-    }
-    if (curr.endsWith('/')) {
-      curr = curr.substring(0, -1);
-    }
+    curr = pathSlashTrim(curr);
     return `${prev}/${curr}`;
   }, host) as string;
 };
@@ -54,18 +54,42 @@ const _publishApiToApim = async ({
   name,
   displayName,
   path,
-  servicePathSuffix,
+  serviceUrlSuffix,
+  dropRoutePrefix,
   products,
   openApiSpec,
   apply = false,
   parameters,
 }: PublishToApimOptions): Promise<void> => {
+  const slashSafeDropRoutePrefix: string | undefined =
+    dropRoutePrefix && !dropRoutePrefix.startsWith('/')
+      ? `/${dropRoutePrefix}`
+      : dropRoutePrefix;
+
+  if (slashSafeDropRoutePrefix) {
+    const hasDuplicatePath = hasDuplicatePathAfterPrefixDrop(
+      Object.keys(openApiSpec.paths),
+      slashSafeDropRoutePrefix,
+    );
+    if (hasDuplicatePath) {
+      logger.err(
+        `After dropging route prefix "${dropRoutePrefix}" from provided operations at least one duplicate path exists for API with name "${name}".`,
+        {
+          allPathsBeforeDroppingPrefix: Object.keys(openApiSpec.paths),
+          dropRoutePrefix,
+        },
+      );
+      process.exit(1);
+    }
+    openApiSpec = dropPrefixFromPaths(openApiSpec, slashSafeDropRoutePrefix);
+  }
+
   const client = new ApiManagementClient(credential, subscriptionId);
 
   const serviceUrl = getServiceUrl(
     openApiSpec.host,
     openApiSpec.basePath,
-    servicePathSuffix,
+    serviceUrlSuffix,
   );
 
   const finalParameters: ApiCreateOrUpdateParameter = {

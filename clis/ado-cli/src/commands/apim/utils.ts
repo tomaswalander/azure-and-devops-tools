@@ -25,7 +25,8 @@ const apiConfigSchema = Joi.array()
       displayName: Joi.string().required(),
       description: Joi.string().required(),
       path: Joi.string().required(),
-      servicePathSuffix: Joi.string().pattern(/^[a-z0-9]+[\\/[\-a-z0-9]+]*$/),
+      serviceUrlSuffix: Joi.string().pattern(/^[a-z0-9]+[\\/[\-a-z0-9]+]*$/),
+      dropRoutePrefix: Joi.string().allow(''),
       operations: Joi.array()
         .required()
         .min(1)
@@ -41,11 +42,70 @@ const apiConfigSchema = Joi.array()
   .unique('displayName')
   .unique('name');
 
+export const pathSlashTrim = (subject: string): string => {
+  if (subject.startsWith('/')) {
+    subject = subject.substring(1);
+  }
+  if (subject.endsWith('/')) {
+    subject = subject.substring(0, subject.length - 1);
+  }
+
+  return subject;
+};
+
+const removePathPrefix = (p: string, prefix: string) => {
+  const safePrefix = pathSlashTrim(prefix);
+
+  return !!prefix && p.startsWith(safePrefix)
+    ? p.substring(safePrefix.length)
+    : p;
+};
+const ensurePathStartsWithSlash = (p: string) => `/${pathSlashTrim(p)}`;
+const atLeastOneDuplicate = <T>(i: T[]) =>
+  i.some((value, index, self) => self.indexOf(value) !== index);
+
+export const hasDuplicatePathAfterPrefixDrop = (
+  items: string[],
+  prefix: string,
+): boolean =>
+  atLeastOneDuplicate(
+    items
+      .map(pathSlashTrim)
+      .map(p => removePathPrefix(p, prefix))
+      .map(ensurePathStartsWithSlash),
+  );
+
 export const validateApiConfigs = (
   config: ApiConfig[] | undefined,
 ): undefined | ValidationError => {
   const result = apiConfigSchema.validate(config);
   return result.error;
+};
+
+const dropPrefixFromKeys = <T>(
+  kvp: Record<string, T>,
+  keyPrefix: string,
+): Record<string, T> => {
+  return Object.keys(kvp).reduce((newKvp: Record<string, T>, key: string) => {
+    const fixedKey =
+      !!keyPrefix && key.startsWith(keyPrefix)
+        ? key.substring(keyPrefix.length)
+        : key;
+    newKvp[fixedKey] = kvp[key];
+
+    return newKvp;
+  }, {} as Record<string, T>);
+};
+
+export const dropPrefixFromPaths = (
+  openApiSpec: OpenApiSpec,
+  prefix: string,
+): OpenApiSpec => {
+  const safePrefix = `/${pathSlashTrim(prefix)}`;
+  return {
+    ...openApiSpec,
+    paths: dropPrefixFromKeys(openApiSpec.paths, safePrefix),
+  };
 };
 
 export const filterOpenApiSpecByOperationIds = (
