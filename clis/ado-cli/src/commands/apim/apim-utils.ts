@@ -110,6 +110,32 @@ const _publishApiToApim = async ({
       finalParameters,
     );
 
+    const productsAlreadyInApi = await client.apiProduct.listByApis(
+      resourceGroupName,
+      apiManagementName,
+      name,
+    );
+    const productsToDelete: string[] = [];
+    for await (const p of productsAlreadyInApi) {
+      if (p.name && !products.includes(p.name)) {
+        productsToDelete.push(p.name);
+      }
+    }
+    await Promise.all(
+      productsToDelete.map(p =>
+        client.productApi
+          .delete(resourceGroupName, apiManagementName, name, p)
+          .catch(err => {
+            logger.err(
+              `Failed to delete product ${p} from api ${name} in ApiM ${apiManagementName} and resource group ${resourceGroupName} with message "${err.message}"`,
+            );
+            logger.info(
+              `Rerun this script to retry OR remove it manually from Azure Portal.`,
+            );
+            return Promise.resolve();
+          }),
+      ),
+    );
     await Promise.all(
       products.map(p =>
         client.productApi.createOrUpdate(
