@@ -4,6 +4,9 @@ import chalk from 'chalk';
 import commander from 'commander';
 import figlet from 'figlet';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const packageInfo = require('../package.json');
+
 const program = new commander.Command();
 program
   .name('ado-cli')
@@ -13,7 +16,9 @@ program
       figlet.textSync('ADO CLI', {
         horizontalLayout: 'full',
       }),
-    )} \n Tools for working with Azure and Azure DevOps`,
+    )}\n${chalk.cyan(`Version: ${packageInfo.version}`)} \n\n${
+      packageInfo.description
+    }`,
   )
   .command('apim', 'Tools for working with Api Management.', {
     executableFile: './apim',
