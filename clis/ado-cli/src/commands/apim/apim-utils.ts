@@ -124,7 +124,7 @@ const _publishApiToApim = async ({
     await Promise.all(
       productsToDelete.map(p =>
         client.productApi
-          .delete(resourceGroupName, apiManagementName, name, p)
+          .delete(resourceGroupName, apiManagementName, p, name)
           .catch(err => {
             logger.err(
               `Failed to delete product ${p} from api ${name} in ApiM ${apiManagementName} and resource group ${resourceGroupName} with message "${err.message}"`,
