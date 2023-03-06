@@ -1,6 +1,6 @@
 {
   "name": "@twalander/ado-cli",
-  "version": "0.0.29",
+  "version": "0.1.0",
   "license": "MIT",
   "description": "A cli with tools for working with Azure and Azure DevOps.",
   "repository": "github:tomaswalander/azure-and-devops-tools",
