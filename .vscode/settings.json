@@ -13,5 +13,9 @@
       "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "editor.formatOnSave": true,
-    "editor.formatOnPaste": true
+    "editor.formatOnPaste": true,
+    "sonarlint.connectedMode.project": {
+      "connectionId": "tomaswalander",
+      "projectKey": "tomaswalander_azure-and-devops-tools"
+    }
   }
