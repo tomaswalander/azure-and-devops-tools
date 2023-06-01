@@ -25,7 +25,7 @@ const apiConfigSchema = Joi.array()
       displayName: Joi.string().required(),
       description: Joi.string().required(),
       path: Joi.string().required(),
-      serviceUrlSuffix: Joi.string().pattern(/^([a-z0-9-]+\/{0,1}){1,}$/),
+      serviceUrlSuffix: Joi.string().pattern(/^([a-z0-9-]+\/?)+$/),
       dropRoutePrefix: Joi.string().allow(''),
       operations: Joi.array()
         .required()

@@ -110,7 +110,7 @@ const _publishApiToApim = async ({
       finalParameters,
     );
 
-    const productsAlreadyInApi = await client.apiProduct.listByApis(
+    const productsAlreadyInApi = client.apiProduct.listByApis(
       resourceGroupName,
       apiManagementName,
       name,
