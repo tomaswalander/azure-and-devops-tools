@@ -24,6 +24,7 @@
     "prepare": "husky install",
     "test": "jest -c ./jest.unit.config.js",
     "test:watch": "yarn test --watch",
+    "test:coverage": "yarn test --coverage",
     "ts-check": "yarn workspaces run ts-check"
   },
   "dependencies": {},

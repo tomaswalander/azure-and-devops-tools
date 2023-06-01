@@ -7,8 +7,10 @@ jobs:
     strategy:
       matrix:
         os:
-          - macos-latest
-          - windows-latest
+          - ubuntu-latest
+          # sonarcloud does not run on macos and windows - switching to ubuntu as temporary fix
+          # - macos-latest
+          # - windows-latest
         node_version:
           - '16.15.1'
     name: '[${{ matrix.os }}][${{ matrix.node_version }}]'
@@ -29,7 +31,7 @@ jobs:
     - name: Checking types
       run: yarn ts-check
     - name: Running tests
-      run: yarn test
+      run: yarn test:coverage
     - uses: actions/checkout@v3
     - name: SonarCloud Scan
       uses: SonarSource/sonarcloud-github-action@master
