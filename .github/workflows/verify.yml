@@ -14,6 +14,8 @@ jobs:
     name: '[${{ matrix.os }}][${{ matrix.node_version }}]'
     steps:
     - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
     - uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node_version }}
@@ -28,3 +30,9 @@ jobs:
       run: yarn ts-check
     - name: Running tests
       run: yarn test
+    - uses: actions/checkout@v3
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
