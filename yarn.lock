@@ -40,7 +40,7 @@
 
 "@azure/core-auth@^1.5.0":
   version "1.5.0"
-  resolved "https://registry.yarnpkg.com/@azure/core-auth/-/core-auth-1.5.0.tgz#a41848c5c31cb3b7c84c409885267d55a2c92e44"
+  resolved "https://registry.npmjs.org/@azure/core-auth/-/core-auth-1.5.0.tgz"
   integrity sha512-udzoBuYG1VBoHVohDTrvKjyzel34zt77Bhp7dQntVGGD0ehVq48owENbBG8fIgkHRNUBQH5k1r0hpoMu5L8+kw==
   dependencies:
     "@azure/abort-controller" "^1.0.0"
@@ -109,7 +109,7 @@
 
 "@azure/core-util@^1.1.0":
   version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@azure/core-util/-/core-util-1.4.0.tgz#c120a56b3e48a9e4d20619a0b00268ae9de891c7"
+  resolved "https://registry.npmjs.org/@azure/core-util/-/core-util-1.4.0.tgz"
   integrity sha512-eGAyJpm3skVQoLiRqm/xPa+SXi/NPDdSHMxbRAz2lSprd+Zs+qrpQGQQ2VQ3Nttu+nSZR4XoYQC71LbEI7jsig==
   dependencies:
     "@azure/abort-controller" "^1.0.0"
@@ -117,7 +117,7 @@
 
 "@azure/identity@^3.3.0":
   version "3.3.0"
-  resolved "https://registry.yarnpkg.com/@azure/identity/-/identity-3.3.0.tgz#0166cfdfa892d73eeb69c390dac91796c6f85f79"
+  resolved "https://registry.npmjs.org/@azure/identity/-/identity-3.3.0.tgz"
   integrity sha512-gISa/dAAxrWt6F2WiDXZY0y2xY4MLlN2wkNW4cPuq5OgPQKLSkxLc4I2WR04puTfZyQZnpXbAapAMEj1b96fgg==
   dependencies:
     "@azure/abort-controller" "^1.0.0"
@@ -146,19 +146,19 @@
 
 "@azure/msal-browser@^2.37.1":
   version "2.38.2"
-  resolved "https://registry.yarnpkg.com/@azure/msal-browser/-/msal-browser-2.38.2.tgz#707725c892258fe6b3af4dd410e1daff608521b5"
+  resolved "https://registry.npmjs.org/@azure/msal-browser/-/msal-browser-2.38.2.tgz"
   integrity sha512-71BeIn2we6LIgMplwCSaMq5zAwmalyJR3jFcVOZxNVfQ1saBRwOD+P77nLs5vrRCedVKTq8RMFhIOdpMLNno0A==
   dependencies:
     "@azure/msal-common" "13.3.0"
 
 "@azure/msal-common@13.3.0", "@azure/msal-common@^13.1.0":
   version "13.3.0"
-  resolved "https://registry.yarnpkg.com/@azure/msal-common/-/msal-common-13.3.0.tgz#dfa39810e0fbce6e07ca85a2cf305da58d30b7c9"
+  resolved "https://registry.npmjs.org/@azure/msal-common/-/msal-common-13.3.0.tgz"
   integrity sha512-/VFWTicjcJbrGp3yQP7A24xU95NiDMe23vxIU1U6qdRPFsprMDNUohMudclnd+WSHE4/McqkZs/nUU3sAKkVjg==
 
 "@azure/msal-node@^1.17.3":
   version "1.18.3"
-  resolved "https://registry.yarnpkg.com/@azure/msal-node/-/msal-node-1.18.3.tgz#e265556d4db0340590eeab5341469fb6740251d0"
+  resolved "https://registry.npmjs.org/@azure/msal-node/-/msal-node-1.18.3.tgz"
   integrity sha512-lI1OsxNbS/gxRD4548Wyj22Dk8kS7eGMwD9GlBZvQmFV8FJUXoXySL1BiNzDsHUE96/DS/DHmA+F73p1Dkcktg==
   dependencies:
     "@azure/msal-common" "13.3.0"
